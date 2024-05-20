@@ -5,6 +5,8 @@ let audioPlayer = <HTMLMediaElement>document.querySelector(".audioPlayer");
 
 console.log(lyricData);
 
+let PAUSED = false;
+
 audioPlayer.onplaying = function (e) {
   let currentAudioPlayerTimeInS = (e.target as HTMLMediaElement).currentTime;
   let currentAudioPlayerTimeInMs = convertFromSecondsToMs(currentAudioPlayerTimeInS);
@@ -14,11 +16,27 @@ audioPlayer.onplaying = function (e) {
   loadLyric(lyric);
 };
 
-async function loadLyric(lyric: typeof lyricData.lyrics.lines) {
-  for await (const [index, line] of lyricData.lyrics.lines.entries()) {
-    let prevLineStartTimeMs = index ? lyricData.lyrics.lines[index - 1].startTimeMs : 0;
+audioPlayer.onpause = function () {
+  PAUSED = true;
+};
 
-    await wait(Number(line.startTimeMs) - Number(prevLineStartTimeMs));
+async function loadLyric(lyric: typeof lyricData.lyrics.lines) {
+  for await (const [index, line] of lyric.entries()) {
+    let prevLineStartTimeMs = index ? lyric[index - 1].startTimeMs : 0;
+    let waitTime;
+    // console.log(line);
+
+    if (audioPlayer.paused) break;
+
+    if (PAUSED) {
+      waitTime = 0;
+      PAUSED = false;
+      audioPlayer.currentTime = convertFromMsToS(Number(line.startTimeMs));
+    } else {
+      waitTime = Number(line.startTimeMs) - Number(prevLineStartTimeMs);
+    }
+
+    await wait(waitTime);
     if (audioPlayer.paused) break;
     console.log(line.words);
   }
@@ -26,10 +44,6 @@ async function loadLyric(lyric: typeof lyricData.lyrics.lines) {
 
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function convertFromSecondsToMs(seconds: number) {
-  return Math.floor(seconds * 1000);
 }
 
 function getAppropriateLineFromLyric(currentTime: number, lyricArray: typeof lyricData.lyrics.lines) {
@@ -44,4 +58,14 @@ function getAppropriateLineFromLyric(currentTime: number, lyricArray: typeof lyr
   }
 
   return lyricArray;
+}
+
+// UTILITY FUCTIONS
+
+function convertFromSecondsToMs(seconds: number) {
+  return Math.floor(seconds * 1000);
+}
+
+function convertFromMsToS(milliseconds: number) {
+  return Math.floor(milliseconds / 1000);
 }
