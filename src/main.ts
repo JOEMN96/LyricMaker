@@ -8,27 +8,29 @@ let recentLine = 0;
 
 audioPlayer.ontimeupdate = function (e) {
   let time = (e.target as HTMLMediaElement).currentTime;
-  let lyric = syncLyric(time, lyricData.lyrics.lines);
+  let lyric = Lyric.syncLyric(time, lyricData.lyrics.lines);
   if (lyric && recentLine === Number(lyric.startTimeMs)) return;
   recentLine = Number(lyric.startTimeMs);
   h2.innerText = lyric?.words || "";
 };
 
-function syncLyric(currentTime: number, lyrics: typeof lyricData.lyrics.lines) {
-  let currentLyric: LYRICLINE[] = lyrics.filter((lyric) => {
-    if (convertFromSecondsToMs(currentTime) > Number(lyric.startTimeMs)) {
-      return lyric;
-    }
-  });
-  return currentLyric[currentLyric.length - 1];
+class Lyric {
+  static syncLyric(currentTime: number, lyrics: typeof lyricData.lyrics.lines) {
+    let currentLyric: LYRICLINE[] = lyrics.filter((lyric) => {
+      if (UtilityFunctions.convertFromSecondsToMs(currentTime) > Number(lyric.startTimeMs)) {
+        return lyric;
+      }
+    });
+    return currentLyric[currentLyric.length - 1];
+  }
 }
 
-// UTILITY FUCTIONS
+class UtilityFunctions {
+  static convertFromSecondsToMs(seconds: number) {
+    return seconds * 1000;
+  }
 
-function convertFromSecondsToMs(seconds: number) {
-  return seconds * 1000;
-}
-
-function convertFromMsToS(milliseconds: number) {
-  return milliseconds / 1000.0;
+  static convertFromMsToS(milliseconds: number) {
+    return milliseconds / 1000.0;
+  }
 }
