@@ -1,3 +1,10 @@
+:root {
+  --textColor1: #09009f;
+  --textColor2: #00ff95;
+  --bgColor1: #ffff;
+  --bgColor2: #ffff;
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -6,4 +13,49 @@
 
 body {
   height: 100%;
+  font-family: "Reddit Mono", monospace;
+}
+
+#textBasedLyric {
+  margin: 0 auto;
+  margin-top: 30px;
+}
+
+#textBasedLyric .wrapper {
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#textBasedLyric .canvasWidth,
+#textBasedLyric .fontNameWrapper {
+  width: 20%;
+  padding: 0 20px 30px;
+}
+
+#textBasedLyric .textBasedCanvasArea {
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 25px;
+}
+
+.textBasedCanvasArea {
+  background: linear-gradient(to right, var(--bgColor1), var(--bgColor2));
+}
+
+#textBasedLyric h2 {
+  font-family: "Monoton", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-align: center;
+  font-size: 60px;
+
+  /* Gradient text */
+  background: -webkit-linear-gradient(45deg, var(--textColor1), var(--textColor2) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.progress-bar {
+  display: none;
 }
