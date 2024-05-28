@@ -1,8 +1,9 @@
 import "./style.css";
-import lyricData from "./testFiles/lyric.json";
+import lyricData from "../public/testFiles/lyric.json";
 
 let audioPlayer = <HTMLMediaElement>document.querySelector(".audioPlayer");
 let h2 = <HTMLHeadingElement>document.querySelector("h2");
+let playBtn = <HTMLButtonElement>document.querySelector(".playBtn");
 
 let recentLine = 0;
 
@@ -14,9 +15,13 @@ audioPlayer.ontimeupdate = function (e) {
   h2.innerText = lyric?.words || "";
 };
 
+playBtn?.addEventListener("click", () => {
+  audioPlayer.play();
+});
+
 class Lyric {
   static syncLyric(currentTime: number, lyrics: typeof lyricData.lyrics.lines) {
-    let currentLyric: LYRICLINE[] = lyrics.filter((lyric) => {
+    let currentLyric: LYRICLINE[] = lyrics.filter((lyric: LYRICLINE) => {
       if (UtilityFunctions.convertFromSecondsToMs(currentTime) > Number(lyric.startTimeMs)) {
         return lyric;
       }
@@ -35,8 +40,10 @@ class HtmlBasedLyricUI {
   textColorPicker2;
   bgColorPicker1;
   bgColorPicker2;
+  controlArea;
 
   constructor() {
+    this.controlArea = <HTMLDivElement>document.querySelector("#textBasedLyric .wrapper");
     this.textBasedCanvasArea = <HTMLDivElement>document.querySelector("#textBasedLyric .textBasedCanvasArea");
     this.progressBar = <HTMLProgressElement>document.querySelector("#textBasedLyric .progress-bar-values");
     this.subtractButton = <HTMLElement>this.progressBar?.nextElementSibling?.nextElementSibling;
@@ -126,10 +133,24 @@ class HtmlBasedLyricUI {
         console.log(error);
       });
   }
+
+  prepareForRecord() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let captureMode = urlParams.get("capture");
+    if (captureMode) {
+      this.controlArea.style.display = "none";
+      // audioPlayer.style.display = "none";
+      playBtn.classList.add("offScreenBtn");
+      audioPlayer.classList.add("offScreenPlayer");
+      this.textBasedCanvasArea.classList.add("fullscreen");
+    }
+  }
 }
 
 let htmlbased = new HtmlBasedLyricUI();
 htmlbased.init();
+htmlbased.prepareForRecord();
+htmlbased.loadFont(1);
 
 class UtilityFunctions {
   static convertFromSecondsToMs(seconds: number) {

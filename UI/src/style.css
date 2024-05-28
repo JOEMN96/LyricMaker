@@ -18,7 +18,6 @@ body {
 
 #textBasedLyric {
   margin: 0 auto;
-  margin-top: 30px;
 }
 
 #textBasedLyric .wrapper {
@@ -58,4 +57,12 @@ body {
 
 .progress-bar {
   display: none;
+}
+
+.fullscreen {
+  height: 100vh;
+  margin-top: 0;
+  display: grid;
+  place-items: center;
+  margin-top: 0 !important;
 }
