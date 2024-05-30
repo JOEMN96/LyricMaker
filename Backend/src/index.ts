@@ -1,6 +1,8 @@
 import express from "express";
 import path from "path";
 import { puppeteerStream } from "./puppeteer.capture";
+import { puppeteerFfmpegStream } from "./puppeteer.ffmpeg";
+import { viaPuppeteer } from "./puppeteer";
 
 const app = express();
 const port = 3000;
@@ -13,7 +15,7 @@ app.get("/", (req, res) => {
 });
 app.get("/test", async (req, res) => {
   try {
-    await puppeteerStream();
+    await puppeteerFfmpegStream();
     res.send({ status: "ok" });
   } catch (error) {
     console.log(error);
