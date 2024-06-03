@@ -17,7 +17,7 @@ export async function viaPuppeteer() {
 
   try {
     const ffmpeg = exec(
-      ` ffmpeg -y -hide_banner  -f gdigrab -framerate 60  -offset_x 0 -offset_y 170 -video_size 1900x703  -i desktop  -f dshow -i audio="Stereo Mix (Realtek High Definition Audio)" -map 0:v -map 1:a -c:a pcm_s24le -ar 96000 -c:v h264_nvenc -preset p6 -tune hq -cq 10 -bufsize 5M -qmin 0 -g 250 -bf 3 -b_ref_mode middle -temporal-aq 1 -rc-lookahead 30 -i_qfactor 0.75 -b_qfactor 1.1 output.mkv `
+      ` ffmpeg -y -hide_banner  -f gdigrab -framerate 60  -offset_x 0 -offset_y 170 -video_size 1900x703  -i desktop  -f dshow -i audio="Stereo Mix (Realtek High Definition Audio)" -map 0:v -map 1:a -c:a pcm_s24le -ar 96000 -c:v h264_nvenc -preset p6 -tune hq -cq 10 -bufsize 5M -qmin 0 -g 250 -bf 3 -b_ref_mode middle -temporal-aq 1 -rc-lookahead 30 -i_qfactor 0.75 -b_qfactor 1.1 videos/output.mkv `
     );
 
     if (ffmpeg && ffmpeg.stderr && ffmpeg.stdin) {
