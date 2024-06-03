@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 });
 app.get("/test", async (req, res) => {
   try {
-    await puppeteerFfmpegStream();
+    await viaPuppeteer();
     res.send({ status: "ok" });
   } catch (error) {
     console.log(error);

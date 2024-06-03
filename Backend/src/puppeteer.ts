@@ -2,15 +2,8 @@ import puppeteer from "puppeteer";
 import { exec } from "child_process";
 
 export async function viaPuppeteer() {
-  // Launch the browser and open a new blank page
-  // const browser = await puppeteer.launch({
-  //   headless: false,
-  //   args: [`--window-size=${1920},${1080}`, "--window-position=0,0", "--start-maximized", "--no-sandbox"],
-  //   defaultViewport: null,
-  // });
-
   const browser = await puppeteer.connect({
-    browserWSEndpoint: "ws://127.0.0.1:9222/devtools/browser/447a8298-cf7a-4427-ae40-158dbcd15cfb",
+    browserWSEndpoint: "ws://127.0.0.1:9222/devtools/browser/3bc52466-93c5-4f00-aecc-107f9f508896",
     defaultViewport: null,
   });
 
@@ -19,15 +12,13 @@ export async function viaPuppeteer() {
   // Navigate the page to a URL
   await page.goto("http://localhost:3000?capture=true");
   const element = await page.waitForSelector(".playBtn");
-  element?.click();
+  await element?.click();
   //http://127.0.0.1:9222/json/version
 
   try {
     const ffmpeg = exec(
-      `ffmpeg -y -f gdigrab -framerate 30 -video_size 720x480 -i desktop -f dshow -i audio="Stereo Mix (Realtek High Definition Audio)" -c:v libvpx-vp9 -b:v 1M -crf 10 -auto-alt-ref 0 -c:a libopus -b:a 128K output.webm`
+      ` ffmpeg -y -hide_banner  -f gdigrab -framerate 60  -offset_x 0 -offset_y 170 -video_size 1900x703  -i desktop  -f dshow -i audio="Stereo Mix (Realtek High Definition Audio)" -map 0:v -map 1:a -c:a pcm_s24le -ar 96000 -c:v h264_nvenc -preset p6 -tune hq -cq 10 -bufsize 5M -qmin 0 -g 250 -bf 3 -b_ref_mode middle -temporal-aq 1 -rc-lookahead 30 -i_qfactor 0.75 -b_qfactor 1.1 output.mkv `
     );
-
-    // `ffmpeg -y  -f gdigrab -framerate 30 -offset_x 0 -offset_y 170  -video_size 1900x703  -show_region 1  -i desktop  output.mp4`
 
     if (ffmpeg && ffmpeg.stderr && ffmpeg.stdin) {
       ffmpeg.stderr.on("data", (chunk: any) => {
@@ -36,12 +27,16 @@ export async function viaPuppeteer() {
 
       setTimeout(async () => {
         ffmpeg.stdin?.write("q");
-        ffmpeg.kill();
         await page.close();
-        // await browser.close();
-      }, 1000 * 5);
+        ffmpeg.kill();
+      }, 1000 * 30);
     }
   } catch (error) {
     console.log(error);
   }
 }
+
+// Other commands
+// ` ffmpeg -y -hide_banner  -f gdigrab -framerate 60 -video_size 1920x1080  -i desktop  -f dshow -i audio="Stereo Mix (Realtek High Definition Audio)" -map 0:v -map 1:a -c:a pcm_s24le -ar 96000 -c:v h264_nvenc -preset p6 -tune hq -cq 10 -bufsize 5M -qmin 0 -g 250 -bf 3 -b_ref_mode middle -temporal-aq 1 -rc-lookahead 30 -i_qfactor 0.75 -b_qfactor 1.1 stream.mkv `;
+// `ffmpeg -y  -f gdigrab -framerate 30 -offset_x 0 -offset_y 170  -video_size 1900x703  -show_region 1  -i desktop  output.mp4`
+// ffmpeg -init_hw_device d3d11va -filter_complex ddagrab=0 -c:v h264_nvenc -cq:v 20 output.mkv
