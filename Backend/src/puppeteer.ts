@@ -1,9 +1,12 @@
 import puppeteer from "puppeteer";
 import { exec } from "child_process";
+import { Response } from "express";
 
-export async function viaPuppeteer() {
+// How to setup - https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
+
+export async function viaPuppeteer(res: Response) {
   const browser = await puppeteer.connect({
-    browserWSEndpoint: "ws://127.0.0.1:9222/devtools/browser/3bc52466-93c5-4f00-aecc-107f9f508896",
+    browserWSEndpoint: process.env.CHROME_URI,
     defaultViewport: null,
   });
 
@@ -29,6 +32,7 @@ export async function viaPuppeteer() {
         ffmpeg.stdin?.write("q");
         await page.close();
         ffmpeg.kill();
+        res.send({ status: "ok" });
       }, 1000 * 30);
     }
   } catch (error) {

@@ -41,6 +41,8 @@ class HtmlBasedLyricUI {
   bgColorPicker1;
   bgColorPicker2;
   controlArea;
+  searchBox;
+  searchBtn;
 
   constructor() {
     this.controlArea = <HTMLDivElement>document.querySelector("#textBasedLyric .wrapper");
@@ -53,6 +55,8 @@ class HtmlBasedLyricUI {
     this.textColorPicker2 = <HTMLInputElement>document.querySelector("#textBasedLyric .textColorPicker2");
     this.bgColorPicker1 = <HTMLInputElement>document.querySelector("#textBasedLyric .bgColorPicker1");
     this.bgColorPicker2 = <HTMLInputElement>document.querySelector("#textBasedLyric .bgColorPicker2");
+    this.searchBox = <HTMLInputElement>document.querySelector(".search");
+    this.searchBtn = <HTMLButtonElement>document.querySelector(".searchBtn");
     this.textBasedCanvasArea.style.width = "60%";
   }
 
@@ -62,6 +66,7 @@ class HtmlBasedLyricUI {
       this.progressBar.value = value;
       this.progressBar.textContent = `${value}%`;
       this.textBasedCanvasArea.style.width = `${value}%`;
+      this.storeValuesInLocalStorage("canvasWidth", String(value));
     });
 
     this.subtractButton.addEventListener("click", () => {
@@ -69,29 +74,49 @@ class HtmlBasedLyricUI {
       this.progressBar.value = value;
       this.progressBar.textContent = `${value}%`;
       this.textBasedCanvasArea.style.width = `${value}%`;
+      this.storeValuesInLocalStorage("canvasWidth", String(value));
     });
 
     this.fontNameSelector.addEventListener("sl-change", () => {
       let index = this.fontNameSelector.value;
       this.loadFont(Number(index));
+      this.storeValuesInLocalStorage("fontName", String(index));
     });
 
     this.textColorPicker1.addEventListener("sl-input", (e) => {
-      document.documentElement.style.setProperty("--textColor1", (e.target as HTMLInputElement)?.value);
+      let color = (e.target as HTMLInputElement)?.value;
+      document.documentElement.style.setProperty("--textColor1", color);
+      this.storeValuesInLocalStorage("--textColor1", color);
     });
 
     this.textColorPicker2.addEventListener("sl-input", (e) => {
-      document.documentElement.style.setProperty("--textColor2", (e.target as HTMLInputElement)?.value);
+      let color = (e.target as HTMLInputElement)?.value;
+      document.documentElement.style.setProperty("--textColor2", color);
+      this.storeValuesInLocalStorage("--textColor2", color);
     });
 
     this.bgColorPicker1.addEventListener("sl-input", (e) => {
-      console.log(e);
-      document.documentElement.style.setProperty("--bgColor1", (e.target as HTMLInputElement)?.value);
+      const bgColor1 = (e.target as HTMLInputElement)?.value;
+      document.documentElement.style.setProperty("--bgColor1", bgColor1);
+      this.storeValuesInLocalStorage("--bgColor1", bgColor1);
     });
 
     this.bgColorPicker2.addEventListener("sl-input", (e) => {
-      document.documentElement.style.setProperty("--bgColor2", (e.target as HTMLInputElement)?.value);
+      const bgColor2 = (e.target as HTMLInputElement)?.value;
+      document.documentElement.style.setProperty("--bgColor2", bgColor2);
+      this.storeValuesInLocalStorage("--bgColor2", bgColor2);
     });
+
+    this.searchBtn.addEventListener("click", async () => {
+      let searchString = this.searchBox.value;
+      if (!searchString) return;
+
+      // add content type header
+      let res = await fetch("/search", { method: "POST", body: JSON.stringify({ query: searchString }) });
+      console.log(res);
+    });
+
+    this.loadStylesFromLocalStorage();
   }
 
   loadFont(index: number) {
@@ -134,6 +159,18 @@ class HtmlBasedLyricUI {
       });
   }
 
+  loadStylesFromLocalStorage() {
+    for (let [key, value] of Object.entries(localStorage)) {
+      if (key.startsWith("--")) {
+        document.documentElement.style.setProperty(key, value);
+      } else if (key === "fontName") {
+        this.loadFont(Number(value));
+      } else if (key === "canvasWidth") {
+        // implement this later
+      }
+    }
+  }
+
   prepareForRecord() {
     const urlParams = new URLSearchParams(window.location.search);
     let captureMode = urlParams.get("capture");
@@ -143,14 +180,18 @@ class HtmlBasedLyricUI {
       playBtn.classList.add("offScreenBtn");
       audioPlayer.classList.add("offScreenPlayer");
       this.textBasedCanvasArea.classList.add("fullscreen");
+      this.loadStylesFromLocalStorage();
     }
+  }
+
+  storeValuesInLocalStorage(name: string, value: string) {
+    localStorage.setItem(name, value);
   }
 }
 
 let htmlbased = new HtmlBasedLyricUI();
 htmlbased.init();
 htmlbased.prepareForRecord();
-htmlbased.loadFont(1);
 
 class UtilityFunctions {
   static convertFromSecondsToMs(seconds: number) {

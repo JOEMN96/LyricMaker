@@ -66,3 +66,8 @@ body {
   place-items: center;
   margin-top: 0 !important;
 }
+
+.audioPlayerArea {
+  max-width: 400px;
+  margin: 20px auto auto;
+}
