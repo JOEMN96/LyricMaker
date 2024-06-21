@@ -1,8 +1,6 @@
 import express from "express";
 import { Response } from "express";
 import path from "path";
-import { puppeteerStream } from "./puppeteer.capture";
-import { puppeteerFfmpegStream } from "./puppeteer.ffmpeg";
 import { viaPuppeteer } from "./puppeteer";
 import SpotifyScrapper from "./SpotifyScrapper";
 import dotenv from "dotenv";
