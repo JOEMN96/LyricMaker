@@ -2,8 +2,6 @@ import puppeteer from "puppeteer";
 import { exec } from "child_process";
 import { Response } from "express";
 
-// How to setup - https://medium.com/@jaredpotter1/connecting-puppeteer-to-existing-chrome-window-8a10828149e0
-
 export async function viaPuppeteer(res: Response) {
   const browser = await puppeteer.connect({
     browserWSEndpoint: process.env.CHROME_URI,
@@ -16,7 +14,6 @@ export async function viaPuppeteer(res: Response) {
   await page.goto("http://localhost:3000?capture=true");
   const element = await page.waitForSelector(".playBtn");
   await element?.click();
-  //http://127.0.0.1:9222/json/version
 
   try {
     const ffmpeg = exec(

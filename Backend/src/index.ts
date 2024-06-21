@@ -18,6 +18,7 @@ app.use("/public", express.static(path.join(__dirname, "../../UI/dist/")));
 app.get("/", (req, res: Response) => {
   res.sendFile(path.join(__dirname, "../../UI/dist/index.html"));
 });
+
 app.get("/test", async (req, res) => {
   try {
     await viaPuppeteer(res);
@@ -28,13 +29,17 @@ app.get("/test", async (req, res) => {
   }
 });
 
-app.post("/search", async (req, res) => {
-  let { query } = req.body;
-  if (!query) return res.send({ message: "invalid parameters" }).sendStatus(400);
+app.get("/search", async (req, res) => {
+  // let { query } = req.body;
+  // if (!query) return res.status(400).json({ message: "invalid parameters" });
   let scrap = new SpotifyScrapper("not like us");
-
   await scrap.init();
-  res.sendStatus(200);
+
+  let data = scrap.songData;
+  if (data.urls && data.urls.cdnurl.length > 1 && data.lyric && data.lyric.lyrics.lines.length > 1) {
+    return res.status(200).json(data);
+  }
+  res.status(404).json({ message: "Unable to find song" });
 });
 
 app.listen(port, () => {
