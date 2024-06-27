@@ -112,8 +112,16 @@ class HtmlBasedLyricUI {
       if (!searchString) return;
 
       // add content type header
-      let res = await fetch("/search", { method: "POST", body: JSON.stringify({ query: searchString }) });
-      console.log(res);
+      let res = await fetch("/search", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: searchString }),
+      });
+      let data = await res.json();
+      console.log(data);
     });
 
     this.loadStylesFromLocalStorage();
